@@ -72,7 +72,13 @@
 
 ## Boekingssysteem topniveau (plan 2026-11-13)
 - [ ] Fase A: hoofdpagina/ontdek/about/info op alle formaten (bezig: hoofdstukken op mobiel opgelost)
+  - [ ] 12 formaten + liggend, geen overflow/afsnijding/CLS, contrast richting AAA, tikdoelen 44px, animaties alleen transform/opacity
+  - [ ] Per pagina titels/omschrijvingen NL/EN/FR/DE + eigen deelafbeelding
 - [ ] Fase B: database (grootboek, agendakoppelingen, routering, locaties, annuleringsbeleid) — Neon pas na GO
+  - [ ] B1: booking_events — onveranderlijk grootboek, hash-keten + server-ondertekening, overzicht ↔ grootboek-controle (db/0265, alleen test)
+  - [ ] B2: agendakoppelingen Google/Microsoft/CalDAV — sleutels alleen als RVE1-envelop in vault_enclave (alleen test)
+  - [ ] B3: publieke kant alleen anonieme tijdvakken/bitmasker (bevestigen + test)
+  - [ ] B4: MCP-hulpmiddelen: vrije tijden lezen, reservering voorbereiden; bevestigen alleen na passkey/step-up van een mens
 - [ ] Fase C: Google/Microsoft/CalDAV sync — wacht op OAuth-apps van eigenaar + host voor Omni-werker
 - [ ] Fase D: gewogen beurtrol, routeringsvragen
 - [ ] Fase E: vergaderruimtes, betalingen, annuleringsbeleid
