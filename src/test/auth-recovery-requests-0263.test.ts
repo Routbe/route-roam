@@ -16,6 +16,7 @@ import { listMigrationFiles, planMigrations } from "../../scripts/migration-plan
 
 const ROOT = join(__dirname, "..", "..");
 const DB_DIR = join(ROOT, "db");
+const CONTRACT_FILE = "0264_recovery_requests_contract.sql";
 
 const ADMIN = "00000000-0000-4000-8000-0000000000a1";
 const ADMIN_NO_2FA = "00000000-0000-4000-8000-0000000000a2";
@@ -55,7 +56,8 @@ beforeAll(async () => {
   const { btree_gist } = await import("@electric-sql/pglite/contrib/btree_gist");
   const { pgcrypto } = await import("@electric-sql/pglite/contrib/pgcrypto");
   db = new PGlite({ extensions: { pgcrypto, btree_gist } });
-  for (const step of planMigrations(listMigrationFiles(DB_DIR), new Set())) {
+  // Up to 0263 only: the CONTRACT 0264 is applied in the last test, on top of this state.
+  for (const step of planMigrations(listMigrationFiles(DB_DIR).filter((f) => f !== CONTRACT_FILE), new Set())) {
     if (step.action === "run") await db.exec(`begin;\n${readFileSync(join(DB_DIR, step.file), "utf8")}\n;commit;`);
   }
   const authUser = 'insert into neon_auth."user"(id, name, email, "emailVerified", "createdAt", "updatedAt", "twoFactorEnabled") values ($1, $2, $3, true, now(), now(), $4)';
@@ -170,8 +172,9 @@ describe("0263 recovery request entry points", () => {
     expect(await asApp(ADMIN, "select count(*)::int as n from public.auth_recovery_requests")).toEqual([{ n: 0 }]);
   });
 
-  it("db-pending/0264 then removes every table right of rout_app and the functions keep working", async () => {
-    const contract = readFileSync(join(ROOT, "db-pending", "0264_recovery_requests_contract.sql"), "utf8");
+  it("0264 then removes every table right of rout_app and the functions keep working", async () => {
+    const contract = readFileSync(join(DB_DIR, CONTRACT_FILE), "utf8");
+    expect(createHash("sha256").update(contract).digest("hex")).toBe("2790c4fec5a42e94416cf86787836352fce510975f2197760ae9d814387b5ec5");
     await db.exec(`begin;\n${contract}\n;commit;`);
     for (const p of ["SELECT", "INSERT", "UPDATE", "DELETE"]) {
       const r = await db.query<{ ok: boolean }>("select has_table_privilege('rout_app', 'public.auth_recovery_requests', $1) as ok", [p]);

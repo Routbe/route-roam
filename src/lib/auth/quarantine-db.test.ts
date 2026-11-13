@@ -1,7 +1,7 @@
 // @vitest-environment node
 /**
  * App code for account recovery (quarantine.server.ts) against a full replay of
- * db/ plus the held-back CONTRACT db-pending/0264: every call runs as rout_app
+ * db/, including the CONTRACT 0264: every call runs as rout_app
  * inside the caller's transaction context, exactly as src/lib/neon.ts does, and
  * rout_app has no table rights left. Proves the app needs only the
  * rout_recovery_* functions and that the admin/2FA rule holds end to end.
@@ -56,7 +56,6 @@ beforeAll(async () => {
   for (const step of planMigrations(listMigrationFiles(DB_DIR), new Set())) {
     if (step.action === "run") await db.exec(`begin;\n${readFileSync(join(DB_DIR, step.file), "utf8")}\n;commit;`);
   }
-  await db.exec(`begin;\n${readFileSync(join(ROOT, "db-pending", "0264_recovery_requests_contract.sql"), "utf8")}\n;commit;`);
   const authUser = 'insert into neon_auth."user"(id, name, email, "emailVerified", "createdAt", "updatedAt", "twoFactorEnabled") values ($1, $2, $3, true, now(), now(), $4)';
   await db.query(authUser, [AUTH_ADMIN, "Admin", "admin@example.test", true]);
   await db.query(authUser, [AUTH_ADMIN_NO_2FA, "Admin2", "admin2@example.test", false]);
