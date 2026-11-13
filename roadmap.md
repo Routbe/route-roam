@@ -60,8 +60,9 @@
 - [x] 0262 — overbodige tabelrechten van rout_app ingetrokken (live op Neon 2026-11-13, nagekeken), bestand in db/, schemaniveau 0262, volledige suite groen
 - [x] auth_recovery_requests: besluit eigenaar — aparte SECURITY DEFINER-ingangen, geen policies
 - [x] db/0263 (EXPAND) — ingangsfuncties voor herstelaanvragen geschreven en getest (bijlage K)
-- [ ] db/0263 live op Neon — wacht op GO van de eigenaar
-- [ ] quarantine.server.ts laten overstappen op de rout_recovery_*-functies — na 0263 live
+- [x] db/0263 live op Neon (2026-11-13, checksum gelijk, per functie nagekeken)
+- [x] quarantine.server.ts gebruikt alleen nog de rout_recovery_*-functies (test tegen db/ + 0264, bijlage L)
+- [ ] Deze code op Vercel zetten — eigenaar (productie meldt nog schemaniveau 0253)
 - [ ] db-pending/0264 (CONTRACT) naar db/ en toepassen — pas als productie schemaniveau 0263 of hoger meldt
 - [x] Briefing in appendix van docs/HANDOVER.md (bijlage B letterlijk, bijlage C controle)
 - [x] QA-testdraaiboek: docs/ROUT-QA-draaiboek.md (kopie in Files)
