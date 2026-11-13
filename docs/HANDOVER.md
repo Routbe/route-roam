@@ -304,3 +304,13 @@ Bijlage M — 0264 live, cyclus herstelaanvragen afgerond (2026-11-13; de tekst 
 - Nagekeken op Neon: `rout_app` heeft 0 tabelrechten op `auth_recovery_requests`; rechtstreeks lezen als `rout_app` geeft `permission denied`; als `rout_app` werken indienen, token opzoeken en de controle op een ongeldig token nog via de functies (alleen-lezen proef, niets opgeslagen).
 - Code: schemaniveau `0264`, snapshot opnieuw gemaakt (tabel zonder rechten), `src/test/auth-recovery-requests-0263.test.ts` speelt `db/` tot en met 0263 af en past daarna 0264 uit `db/` toe (met checksumcontrole); `src/lib/auth/quarantine-db.test.ts` speelt heel `db/` af; `src/test/table-rights-0262.test.ts` speelt nu strikt de bestanden vóór 0262 af (anders zat 0264 al in de opbouw). Vingerafdrukken 0258-0264 op Neon gelijk aan de bestanden. `db-pending/` houdt niets meer achter.
 - Na een volgend deploy meldt de health-probe `0264`; 0264 veranderde alleen databaserechten, dus de code op Vercel met niveau 0263 is ermee verenigbaar.
+
+---
+
+Bijlage N — fase afgesloten op verzoek van de eigenaar (2026-11-13 18:11 UTC; de tekst hierboven, ook bijlage M, is ongewijzigd overgenomen)
+
+- De eigenaar sloot deze architectuurfase af: "We parkeren het development werk hier ... je mag het dossier nu definitief dichtklappen." Development werk staat geparkeerd; er is na dit bericht niets meer veranderd.
+- Database (Neon): migraties `0258` tot en met `0264` live, 261 toegepaste rijen in `public.schema_migrations`, 0 afwijkingen tegen `db/`, vingerafdrukken `0258`-`0264` gelijk aan de bestanden. `public.auth_recovery_requests` is alleen bereikbaar via de zes `rout_recovery_*`-ingangen (alle SECURITY DEFINER, `search_path = pg_catalog, pg_temp`); `rout_app` heeft er geen tabelrechten meer.
+- Code: schemaniveau `0264`, `db-pending/` houdt niets meer achter, werkboom schoon. Laatste volledige suite na de laatste wijziging: 471 testbestanden, 2805 tests geslaagd.
+- Over de eigenaar, buiten dit dossier om: nog één Vercel-deploy zodat de health-probe `0264` meldt; het QA-draaiboek (`docs/ROUT-QA-draaiboek.md`) uitvoeren met de fysieke NXP-kaarten en toestellen; en de twee open punten in `roadmap.md` (logo-cascade bij een hard delete, en de doorkliktest van de admin-weigering en de boekingenpagina op het Vercel-deploy).
+- Dossier dicht: de genummerde secties en bijlagen A tot en met M blijven ongewijzigd; deze bijlage N is de slotstand.
