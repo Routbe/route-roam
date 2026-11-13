@@ -69,3 +69,12 @@
 - [x] QA-testdraaiboek: docs/ROUT-QA-draaiboek.md (kopie in Files)
 - [x] /t-schermen en knoppen in nl/en/fr/de (cardTap.* in interface-bundels); zegel "Authentic ROUT Card" blijft bewust Engels
 - [ ] QA-draaiboek uitvoeren op het Vercel-deploy — eigenaar, met fysieke kaarten en toestellen
+
+## Boekingssysteem topniveau (plan 2026-11-13)
+- [ ] Fase A: hoofdpagina/ontdek/about/info op alle formaten (bezig: hoofdstukken op mobiel opgelost)
+- [ ] Fase B: database (grootboek, agendakoppelingen, routering, locaties, annuleringsbeleid) — Neon pas na GO
+- [ ] Fase C: Google/Microsoft/CalDAV sync — wacht op OAuth-apps van eigenaar + host voor Omni-werker
+- [ ] Fase D: gewogen beurtrol, routeringsvragen
+- [ ] Fase E: vergaderruimtes, betalingen, annuleringsbeleid
+- [ ] Fase F: boekings-, beheer- en hostpagina's, mails NL/EN/FR/DE
+- [ ] Fase G: intake-versleuteling, ROUT ID, Wallet, MCP-hulpmiddelen
