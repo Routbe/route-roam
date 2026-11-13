@@ -1,7 +1,7 @@
 // @vitest-environment node
 /**
- * db-pending/0262 (held back): rout_app keeps on the 17 tables, views and
- * sequences only the rights app code uses. Replays db/, recreates the extra
+ * db/0262 (live on Neon since 2026-11-13): rout_app keeps on the 17 tables, views and
+ * sequences only the rights app code uses. Replays db/ up to 0261, recreates the extra
  * rights found on Neon on 2026-11-13, applies 0262 and checks every right;
  * card status changes must still work and card keys must not be writable.
  */
@@ -13,7 +13,8 @@ import { listMigrationFiles, planMigrations } from "../../scripts/migration-plan
 
 const ROOT = join(__dirname, "..", "..");
 const DB_DIR = join(ROOT, "db");
-const CONTRACT = readFileSync(join(ROOT, "db-pending", "0262_table_rights_least_privilege.sql"), "utf8");
+const CONTRACT_FILE = "0262_table_rights_least_privilege.sql";
+const CONTRACT = readFileSync(join(DB_DIR, CONTRACT_FILE), "utf8");
 
 /** What Neon had beyond db/ (table-level, as found in pg_class.relacl). */
 const NEON_EXTRAS = [
@@ -49,11 +50,13 @@ const KEEP: Record<string, string[]> = {
   "public.wallet_passes": ["SELECT"],
 };
 
+/** Replays db/ before 0262, so the extra Neon rights can be recreated first. */
 async function replay() {
   const { btree_gist } = await import("@electric-sql/pglite/contrib/btree_gist");
   const { pgcrypto } = await import("@electric-sql/pglite/contrib/pgcrypto");
   const db = new PGlite({ extensions: { pgcrypto, btree_gist } });
-  for (const step of planMigrations(listMigrationFiles(DB_DIR), new Set())) {
+  const before = listMigrationFiles(DB_DIR).filter((f) => f !== CONTRACT_FILE);
+  for (const step of planMigrations(before, new Set())) {
     if (step.action === "run") await db.exec(`begin;\n${readFileSync(join(DB_DIR, step.file), "utf8")}\n;commit;`);
   }
   return db;
@@ -95,6 +98,11 @@ describe("0262 keeps rout_app to the table rights the app uses", () => {
       await db.close();
     }
   }, 300_000);
+
+  it("keeps the exact checksum Neon recorded", async () => {
+    const { checksumOf } = await import("../../scripts/migration-plan");
+    expect(checksumOf(CONTRACT)).toBe("a48f23389624a5062f805166964323de4208dfa168c1cdd07cd793be073131f4");
+  });
 
   it("is safe on a fresh replay of db/ that never had the extra rights", async () => {
     const db = await replay();
