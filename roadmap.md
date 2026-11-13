@@ -57,8 +57,12 @@
 - [x] Herbouw uit db/ gelijk aan Neon voor alle functierechten (db/0260, op Neon aantoonbaar zonder effect)
 - [x] db/0261 — drie ongebruikte SECURITY DEFINER-functies weg bij rout_app + samenvoegen met de handle van het tweede account herstellen (live op Neon 2026-11-13, per functie nagekeken)
 - [x] 17 tabellen/reeksen: onderzoek per tabel klaar (bijlage J); voorstel db-pending/0262 getest
-- [ ] db-pending/0262 — overbodige tabelrechten van rout_app intrekken — wacht op GO van de eigenaar
-- [ ] auth_recovery_requests: RLS zonder policy, herstelaanvragen worden niet opgeslagen — wacht op besluit eigenaar (policies of definer-ingangen)
+- [x] 0262 — overbodige tabelrechten van rout_app ingetrokken (live op Neon 2026-11-13, nagekeken), bestand in db/, schemaniveau 0262, volledige suite groen
+- [x] auth_recovery_requests: besluit eigenaar — aparte SECURITY DEFINER-ingangen, geen policies
+- [x] db/0263 (EXPAND) — ingangsfuncties voor herstelaanvragen geschreven en getest (bijlage K)
+- [ ] db/0263 live op Neon — wacht op GO van de eigenaar
+- [ ] quarantine.server.ts laten overstappen op de rout_recovery_*-functies — na 0263 live
+- [ ] db-pending/0264 (CONTRACT) naar db/ en toepassen — pas als productie schemaniveau 0263 of hoger meldt
 - [x] Briefing in appendix van docs/HANDOVER.md (bijlage B letterlijk, bijlage C controle)
 - [x] QA-testdraaiboek: docs/ROUT-QA-draaiboek.md (kopie in Files)
 - [x] /t-schermen en knoppen in nl/en/fr/de (cardTap.* in interface-bundels); zegel "Authentic ROUT Card" blijft bewust Engels

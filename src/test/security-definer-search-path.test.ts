@@ -9,7 +9,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { listMigrationFiles } from "../../scripts/migration-plan";
+import { listMigrationFiles, migrationNumber } from "../../scripts/migration-plan";
 import { HARDENED_BY_MIGRATION, LEGACY_DEFINER_SEARCH_PATH, legacyAllowedAfter } from "../../scripts/security-definer-legacy";
 import {
   definerFindings,
@@ -30,6 +30,15 @@ const snapshot = JSON.parse(readFileSync(join(DB_DIR, "schema.snapshot.json"), "
 const definers = snapshot.functions
   .filter((f) => isSecurityDefinerDef(f.def))
   .map((f) => ({ key: definerKey(f.schema, f.name, f.args), searchPath: searchPathFromDef(f.def) }));
+
+/** schema.name of every function a migration after 0258 creates (born pinned, so 0258 never names them). */
+const createdAfter0258 = new Set(
+  listMigrationFiles(DB_DIR)
+    .filter((f) => migrationNumber(f) > 258)
+    .flatMap((f) => [...readFileSync(join(DB_DIR, f), "utf8").matchAll(/create\s+(?:or\s+replace\s+)?function\s+(\w+)\.(\w+)\s*\(/gi)])
+    .map((m) => `${m[1]}.${m[2]}`),
+);
+const definersUpTo0258 = definers.filter((d) => !createdAfter0258.has(d.key.slice(0, d.key.indexOf("("))));
 
 const BATCH_1 = [
   "public.rout_card_design(s text)",
@@ -222,10 +231,11 @@ describe("migration files from 0255 on", () => {
     // Only the borrowed owner role around execute_account_merge, as in 0215/0242.
     expect(all.filter((s) => OWN.test(s))).toHaveLength(2);
     const statements = all.filter((s) => !OWN.test(s));
-    expect(statements).toHaveLength(definers.length);
+    expect(definersUpTo0258).toHaveLength(348);
+    expect(statements).toHaveLength(definersUpTo0258.length);
     const keys = statements.map((s) => s.match(/^alter function (.+) set search_path = pg_catalog, pg_temp$/)?.[1]);
     expect(keys.every(Boolean)).toBe(true);
-    expect([...keys].sort()).toEqual(definers.map((f) => f.key).sort());
+    expect([...keys].sort()).toEqual(definersUpTo0258.map((f) => f.key).sort());
   });
 
   it("0255 only changes search_path settings and one PUBLIC grant", () => {
