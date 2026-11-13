@@ -46,7 +46,19 @@ describe("2-of-3 recovery", async () => {
     expect([...(await recoverMasterKey({ ceremony, memberId: ALICE, factorSecretKeys: { device_prf: device.secretKey, paper_guardian: again.secretKey } }))]).toEqual([...master]);
     const swapped = [...words];
     [swapped[0], swapped[1]] = [swapped[1] ?? "", swapped[0] ?? ""];
-    expect(() => paperFactorKeys(swapped.join(" "), ALICE)).toThrow(RecoveryError);
+    // A swapped phrase usually fails the checksum; about 1 in 256 still passes it,
+    // and then the key it derives must not open the shard.
+    let wrongKeys: ReturnType<typeof paperFactorKeys> | null = null;
+    try {
+      wrongKeys = paperFactorKeys(swapped.join(" "), ALICE);
+    } catch (e) {
+      expect(e).toBeInstanceOf(RecoveryError);
+    }
+    if (wrongKeys) {
+      await expect(
+        recoverMasterKey({ ceremony, memberId: ALICE, factorSecretKeys: { device_prf: device.secretKey, paper_guardian: wrongKeys.secretKey } }),
+      ).rejects.toThrow(RecoveryError);
+    }
     // Same words, other member: a different key, so the shard does not open.
     const bobPaper = paperFactorKeys(paper.mnemonic, BOB);
     expect([...bobPaper.publicKey]).not.toEqual([...paper.keys.publicKey]);
