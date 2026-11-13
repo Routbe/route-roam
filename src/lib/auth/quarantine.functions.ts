@@ -8,7 +8,7 @@ export const listRecoveryRequestsFn = createServerFn({ method: "GET" })
     const { assertAdminRole } = await import("@/lib/admin.server");
     await assertAdminRole(context.userId);
     const { listRecoveryRequests } = await import("./quarantine.server");
-    return listRecoveryRequests();
+    return listRecoveryRequests(context.userId);
   });
 
 type Decision = { id: string; note?: string | null };
