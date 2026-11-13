@@ -62,8 +62,9 @@
 - [x] db/0263 (EXPAND) — ingangsfuncties voor herstelaanvragen geschreven en getest (bijlage K)
 - [x] db/0263 live op Neon (2026-11-13, checksum gelijk, per functie nagekeken)
 - [x] quarantine.server.ts gebruikt alleen nog de rout_recovery_*-functies (test tegen db/ + 0264, bijlage L)
-- [ ] Deze code op Vercel zetten — eigenaar (productie meldt nog schemaniveau 0253)
-- [ ] db-pending/0264 (CONTRACT) naar db/ en toepassen — pas als productie schemaniveau 0263 of hoger meldt
+- [x] Deze code op Vercel gezet door de eigenaar (health-probe meldde 0263, 2026-11-13 18:05 UTC)
+- [x] 0264 (CONTRACT) in db/ en live op Neon (2026-11-13): rout_app heeft geen tabelrechten meer op auth_recovery_requests, schemaniveau 0264
+- [ ] Productie opnieuw deployen zodat de health-probe 0264 meldt — eigenaar (geen haast: 0264 verandert alleen databaserechten)
 - [x] Briefing in appendix van docs/HANDOVER.md (bijlage B letterlijk, bijlage C controle)
 - [x] QA-testdraaiboek: docs/ROUT-QA-draaiboek.md (kopie in Files)
 - [x] /t-schermen en knoppen in nl/en/fr/de (cardTap.* in interface-bundels); zegel "Authentic ROUT Card" blijft bewust Engels

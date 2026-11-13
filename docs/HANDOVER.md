@@ -293,3 +293,14 @@ Bijlage L — 0263 live, app-code overgestapt, 0264 wacht op het Vercel-deploy (
 - Test: `src/lib/auth/quarantine-db.test.ts` draait de echte app-code tegen een volledige herbouw van `db/` plus `db-pending/0264`, als `rout_app` met de verzoekcontext. Tegenproef: met de oude rechtstreekse schrijfopdracht faalt de test met `permission denied for table auth_recovery_requests`.
 - Losstaand: `src/lib/crypto-enclave/recovery-mpc.test.ts` faalde af en toe, omdat twee verwisselde woorden van de papieren code in ongeveer 1 op 256 gevallen toch een geldige controlesom geven. De test eist nu dat zo'n verkeerde zin ofwel geweigerd wordt, ofwel een sleutel geeft die het herstel niet opent.
 - 0264 is NIET toegepast: productie (`https://rout.be/api/public/health`) meldt om 2026-11-13 ~18:00 UTC nog schemaniveau `0253`. Het Vercel-deploy draait dus nog oude code die de tabel rechtstreeks aanspreekt (wat sinds db/0207 al door RLS werd geweigerd). Volgorde: (1) de eigenaar zet deze code op Vercel; (2) de health-probe meldt `0263` of hoger; (3) `db-pending/0264` gaat naar `db/`, wordt toegepast op Neon, en het schemaniveau gaat naar `0264`.
+
+---
+
+Bijlage M — 0264 live, cyclus herstelaanvragen afgerond (2026-11-13; de tekst hierboven, ook bijlage L, is ongewijzigd overgenomen)
+
+- De eigenaar zette de code op Vercel. Zelf nagekeken: `https://rout.be/api/public/health` meldde om 18:05 UTC drie keer `schema: "0263"` (`cache-control: no-store`, Vercel-cache MISS).
+- Vooraf op Neon nagekeken: alleen de zes `rout_recovery_*`-ingangen (alle SECURITY DEFINER) raken `public.auth_recovery_requests`; er zijn geen triggers, policies of views op de tabel, die 0 rijen had. `rout_app` had nog SELECT, INSERT en UPDATE. `scripts/owner-passkey-link.ts` gebruikt de eigenaarsverbinding, niet `rout_app`, en blijft dus werken.
+- `0264_recovery_requests_contract.sql` ongewijzigd naar `db/` verplaatst en op Neon toegepast in één transactie (intrekken met controle, SECURITY DEFINER-bewaking, rij in `public.schema_migrations`), checksum `2790c4fe…7b5ec5`. Neon telt nu 261 toegepaste migraties.
+- Nagekeken op Neon: `rout_app` heeft 0 tabelrechten op `auth_recovery_requests`; rechtstreeks lezen als `rout_app` geeft `permission denied`; als `rout_app` werken indienen, token opzoeken en de controle op een ongeldig token nog via de functies (alleen-lezen proef, niets opgeslagen).
+- Code: schemaniveau `0264`, snapshot opnieuw gemaakt (tabel zonder rechten), `src/test/auth-recovery-requests-0263.test.ts` speelt `db/` tot en met 0263 af en past daarna 0264 uit `db/` toe (met checksumcontrole); `src/lib/auth/quarantine-db.test.ts` speelt heel `db/` af. `db-pending/` houdt niets meer achter.
+- Na een volgend deploy meldt de health-probe `0264`; 0264 veranderde alleen databaserechten, dus de code op Vercel met niveau 0263 is ermee verenigbaar.
