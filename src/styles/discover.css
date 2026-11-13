@@ -416,3 +416,6 @@
   .dsc-tiles, .home-grid-3.home-swipe, .gateway-editorial :is(.story-more-grid, #ai-agents ol) { mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); }
   .gateway-editorial :is(.story-more-grid, #ai-agents ol) > * { min-width: 0; overflow-wrap: anywhere; }
 }
+@media (max-width: 639px) {
+  .chapter-deck-tabs { mask-image: linear-gradient(to right, black calc(100% - 32px), transparent); scroll-padding-inline: 20px; }
+}
