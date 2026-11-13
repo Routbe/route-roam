@@ -3934,13 +3934,7 @@
       "rls": true,
       "forceRls": false,
       "policies": [],
-      "grants": {
-        "rout_app": [
-          "INSERT",
-          "SELECT",
-          "UPDATE"
-        ]
-      }
+      "grants": {}
     },
     {
       "schema": "public",

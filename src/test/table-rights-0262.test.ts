@@ -55,7 +55,10 @@ async function replay() {
   const { btree_gist } = await import("@electric-sql/pglite/contrib/btree_gist");
   const { pgcrypto } = await import("@electric-sql/pglite/contrib/pgcrypto");
   const db = new PGlite({ extensions: { pgcrypto, btree_gist } });
-  const before = listMigrationFiles(DB_DIR).filter((f) => f !== CONTRACT_FILE);
+  // Strictly the files before 0262 (later ones, such as the 0264 contract, did not exist yet).
+  const all = listMigrationFiles(DB_DIR);
+  const before = all.slice(0, all.indexOf(CONTRACT_FILE));
+  expect(before.length).toBeGreaterThan(0);
   for (const step of planMigrations(before, new Set())) {
     if (step.action === "run") await db.exec(`begin;\n${readFileSync(join(DB_DIR, step.file), "utf8")}\n;commit;`);
   }
