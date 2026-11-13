@@ -87,5 +87,8 @@ use the editor.
 ## Account creation
 - A Better Auth user row is created only inside runPasskeyAccountCreation (passkey-enrollment.server.ts); the user.create.before hook refuses every other path and the bridge creates no public.users row for an identity without a passkey. Why: registration must be passkey-only regardless of which provider or plugin is enabled.
 
+## Account recovery requests
+- public.auth_recovery_requests is reached only through the rout_recovery_* SECURITY DEFINER functions (db/0263): filing answers the same for every input, deciding requires a full admin with two-factor on taken from rout.current_user_id, and binding tokens reach the database only as SHA-256. Why: no account enumeration, no trust in caller-supplied admin ids, and no raw token at rest.
+
 ## Uploaded photos
 - Neon-fallback photo uploads are pruned only through public.rout_prune_avatar_uploads (db/0252), which keeps every photo a profile, draft, workspace or app logo still references; without it nothing is pruned. Why: a member's uploads serve several workspaces, so a per-member count deleted logos still in use.
